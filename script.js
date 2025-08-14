@@ -3,64 +3,63 @@ const Tesseract = require("tesseract.js");
 const fs = require("fs-extra");
 const path = require("path");
 
-// Regex para capturar e formatar números de telefone
-function extrairTelefonesE164(texto) {
+function extractPhonesE164(text) {
   const regex = /\(?\d{2}\)?\s?\d{4,5}[-\s]?\d{4}/g;
-  const encontrados = texto.match(regex) || [];
-  const numeros = encontrados.map((num) => {
-    const digitos = num.replace(/\D/g, "");
-    if (digitos.length === 10 || digitos.length === 11) {
-      return `+55${digitos}`;
+  const matches = text.match(regex) || [];
+  const numbers = matches.map((num) => {
+    const digits = num.replace(/\D/g, "");
+    if (digits.length === 10 || digits.length === 11) {
+      return `+55${digits}`;
     }
     return null;
   }).filter(Boolean);
-  return numeros;
+  return numbers;
 }
 
-const pastaFrames = path.join(__dirname, "frames");
-const videoEntrada = "capturadetela.mp4";
+const framesFolder = path.join(__dirname, "frames");
+const inputVideo = "capturadetela.mp4";
 
-async function extrairFrames(videoPath, intervaloSegundos = 1) {
-  await fs.ensureDir(pastaFrames);
-  await fs.emptyDir(pastaFrames);
+async function extractFrames(videoPath, intervalSeconds = 1) {
+  await fs.ensureDir(framesFolder);
+  await fs.emptyDir(framesFolder);
 
   return new Promise((resolve, reject) => {
     ffmpeg(videoPath)
-      .outputOptions([`-vf fps=1/${intervaloSegundos}`])
-      .output(path.join(pastaFrames, "frame_%04d.png"))
+      .outputOptions([`-vf fps=1/${intervalSeconds}`])
+      .output(path.join(framesFolder, "frame_%04d.png"))
       .on("end", resolve)
       .on("error", reject)
       .run();
   });
 }
 
-async function processarOCR() {
-  const arquivos = (await fs.readdir(pastaFrames)).filter(f => f.endsWith(".png"));
-  const telefonesSet = new Set();
+async function processOCR() {
+  const files = (await fs.readdir(framesFolder)).filter(f => f.endsWith(".png"));
+  const phonesSet = new Set();
 
-  for (const arquivo of arquivos) {
-    const caminho = path.join(pastaFrames, arquivo);
-    const resultado = await Tesseract.recognize(caminho, "por", { logger: m => console.log(m.status) });
-    const extraidos = extrairTelefonesE164(resultado.data.text);
-    extraidos.forEach(num => telefonesSet.add(num));
+  for (const file of files) {
+    const filePath = path.join(framesFolder, file);
+    const result = await Tesseract.recognize(filePath, "por", { logger: m => console.log(m.status) });
+    const extracted = extractPhonesE164(result.data.text);
+    extracted.forEach(num => phonesSet.add(num));
   }
 
-  const listaFinal = Array.from(telefonesSet).sort();
+  const finalList = Array.from(phonesSet).sort();
 
-  // Salvar como TXT
-  const txtPath = "telefones_formatados.txt";
-  fs.writeFileSync(txtPath, listaFinal.join("\n"), "utf8");
+  // Save file
+  const txtPath = "formatted_phones.txt";
+  fs.writeFileSync(txtPath, finalList.join("\n"), "utf8");
 
-  console.log(`${listaFinal.length} número(s) salvos em '${txtPath}'`);
+  console.log(`${finalList.length} number(s) saved in '${txtPath}'`);
 }
 
 (async () => {
   try {
-    console.log("Extraindo frames...");
-    await extrairFrames(videoEntrada);
-    console.log("Executando OCR e formatando...");
-    await processarOCR();
+    console.log("Extracting frames...");
+    await extractFrames(inputVideo);
+    console.log("Running OCR and formatting...");
+    await processOCR();
   } catch (err) {
-    console.error("Erro:", err);
+    console.error("Error:", err);
   }
 })();
