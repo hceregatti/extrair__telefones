@@ -72,3 +72,5 @@ node script.js
 ## 📄 Licença
 
 MIT - sinta-se livre para usar e modificar como quiser.
+
+[LICENSE](https://github.com/hceregatti/extrair__telefones/blob/main/LICENSE.md)
