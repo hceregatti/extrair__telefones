@@ -17,7 +17,7 @@ Este projeto em Node.js permite extrair **números de telefone brasileiros** a p
 - [Tesseract.js](https://github.com/naptha/tesseract.js)
 - [Fluent-ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
 - [fs-extra](https://github.com/jprichardson/node-fs-extra)
-- [FFmpeg](https://ffmpeg.org/) (deve estar instalado no sistema)
+- [FFmpeg](https://ffmpeg.org/) (fornecido automaticamente via dependência npm)
 
 ## 📂 Estrutura
 
@@ -33,11 +33,10 @@ Este projeto em Node.js permite extrair **números de telefone brasileiros** a p
 ## ⚙️ Pré-requisitos
 
 - Node.js e npm instalados
-- FFmpeg instalado e disponível no PATH do sistema
 - Instale as dependências do projeto:
 
 ```bash
-npm install fluent-ffmpeg tesseract.js fs-extra
+npm install
 ```
 
 ## ▶️ Como Usar
