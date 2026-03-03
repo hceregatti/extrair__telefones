@@ -3,3 +3,5 @@ node_modules/
 frames/
 capturadetela.mp4
 contatos-grupo-loc.txt
+dist/
+*.dmg

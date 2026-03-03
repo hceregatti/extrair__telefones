@@ -54,7 +54,7 @@ async function processOCR() {
   const finalList = Array.from(phonesSet).sort();
 
   // Save file
-  const txtPath = 'formatted_phones.txt';
+  const txtPath = 'telefones-formatados.txt';
   fs.writeFileSync(txtPath, finalList.join('\n'), 'utf8');
 
   console.log(`${finalList.length} number(s) saved in '${txtPath}'`);
