@@ -1,72 +1,84 @@
-# 📞 Extração de Telefones de Vídeo com OCR
+# 📞 Extração de Telefones de Vídeo com OCR (Desktop App)
 
-Este projeto em Node.js permite extrair **números de telefone brasileiros** a partir de **um vídeo**, utilizando OCR (Reconhecimento Óptico de Caracteres) com o Tesseract.js e o processamento de vídeo com FFmpeg.
+Este projeto é uma **aplicação desktop** construída com **Electron.js** que permite extrair **números de telefone brasileiros** a partir de um **vídeo**. A ferramenta utiliza OCR (Reconhecimento Óptico de Caracteres) com o Tesseract.js e o processamento de vídeo com FFmpeg para identificar números de telefone de forma automatizada.
 
 ## 🚀 Funcionalidades
 
-- Extrai frames de um vídeo a cada X segundos.
-- Executa OCR em cada frame para reconhecer textos.
-- Identifica números de telefone com DDD no texto.
-- Formata os números no padrão internacional E.164 (`+55`).
-- Remove duplicatas automaticamente.
-- Salva os resultados em um arquivo `telefones_formatados.txt`.
+- **Interface Gráfica Amigável:** Interface construída com HTML e estilizada com TailwindCSS.
+- **Seleção de Vídeos:** Escolha vídeos (`.mp4`, `.avi`, `.mov`) diretamente do seu computador.
+- **Extração Rápida:** Extrai frames do vídeo (1 frame por segundo) e usa OCR para reconhecer textos.
+- **Validação de Telefones:** Identifica números de telefone com DDD no texto e os formata no padrão internacional E.164 (`+55`).
+- **Remoção de Duplicatas:** Filtra e exibe os números de forma única.
+- **Feedback em Tempo Real:** Barra de progresso e um _timer_ de contagem regressiva (limite de 60 segundos por extração).
+- **Tratamento de Erros:** Alertas caso a extração demore demais ou ocorram erros.
+- **Salvar Resultados:** Permite salvar os números extraídos em um arquivo `.txt` escolhido pelo usuário através de um diálogo de salvamento do sistema.
+- **Limpeza Automática:** Remove arquivos e pastas temporárias após concluir a extração, poupando espaço no disco.
 
 ## 🧰 Tecnologias Utilizadas
 
-- [Node.js](https://nodejs.org/)
-- [Tesseract.js](https://github.com/naptha/tesseract.js)
-- [Fluent-ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)
-- [fs-extra](https://github.com/jprichardson/node-fs-extra)
-- [FFmpeg](https://ffmpeg.org/) (fornecido automaticamente via dependência npm)
+- **[Electron](https://www.electronjs.org/)**: Para criação da aplicação desktop multiplataforma.
+- **[Node.js](https://nodejs.org/)**: Backend da aplicação (Main Process).
+- **[Tesseract.js](https://github.com/naptha/tesseract.js)**: Motor de OCR.
+- **[Fluent-ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg) e [@ffmpeg-installer/ffmpeg]**: Para manipulação do vídeo e extração de frames.
+- **[TailwindCSS](https://tailwindcss.com/)**: Para estilização rápida da interface (via CDN).
+- **[fs-extra](https://github.com/jprichardson/node-fs-extra)**: Para manipulação de arquivos e diretórios pesados.
 
-## 📂 Estrutura
+## 📂 Estrutura do Projeto
 
-```
+```text
 .
-├── frames/                   # Pasta temporária dos frames extraídos
-├── capturadetela.mp4         # Vídeo de entrada
-├── telefones_formatados.txt  # Telefones extraídos (saída)
-├── script.js                 # Código principal
+├── src/
+│   ├── extractor.js        # Lógica de extração usando ffmpeg e Tesseract
+│   ├── renderer.html       # Interface visual do usuário (UI)
+│   └── renderer.js         # Lógica de controle de eventos da interface
+├── main.js                 # Arquivo centralizador do Electron (Main Process)
+├── preload.js              # Intermediário seguro (Context Bridge) entre UI e Main Process
+├── package.json            # Dependências e scripts
 └── README.md
 ```
 
 ## ⚙️ Pré-requisitos
 
-- Node.js e npm instalados
-- Instale as dependências do projeto:
+- **Node.js** instalado (versão recomendada: LTS).
+- Ferramenta de gerenciamento de pacotes (`npm`).
+
+## ▶️ Como Rodar em Ambiente de Desenvolvimento
+
+1. Clone o repositório ou baixe os arquivos.
+2. Instale as dependências executando no terminal, dentro da pasta do projeto:
 
 ```bash
 npm install
 ```
 
-## ▶️ Como Usar
-
-1. Coloque seu vídeo no mesmo diretório com o nome `capturadetela.mp4` (ou edite o caminho no código).
-2. Execute o script:
+3. Inicie o aplicativo com o Electron:
 
 ```bash
-node script.js
+npm run dev
 ```
 
-3. Após a execução, os números extraídos estarão no arquivo `telefones_formatados.txt`.
+## 📦 Como Gerar o Executável (Build)
 
-## 📝 Exemplo de Saída
+O projeto utiliza o `electron-builder` para criar os instaladores do aplicativo.
+Para gerar o build final (como `.dmg` para Mac ou `.nsis` para Windows), execute:
 
+```bash
+npm run build
 ```
-+5511999998888
-+5511987654321
-+551132456789
-```
 
-## 🛠 Personalização
+## ▶️ Como Usar o Aplicativo
 
-- **Intervalo entre frames:** Altere o valor `intervaloSegundos` na função `extrairFrames` para capturar mais ou menos imagens.
-- **Regex de telefones:** A função `extrairTelefonesE164()` pode ser ajustada conforme o padrão desejado.
+1. Abra o aplicativo.
+2. Clique em **"Selecione o vídeo"** e escolha o arquivo desejado.
+3. Clique em **"Extrair Telefones"**. Aguarde o processamento (você verá o timer e o progresso na tela).
+4. Assim que os números forem identificados, eles aparecerão na caixa de resultados.
+5. Clique em **"Salvar Resultados"** para guardá-los e selecione uma pasta no seu computador.
 
-## ❗️ Observações
+## ❗️ Observações Adicionais
 
-- A acurácia depende da qualidade do vídeo e da nitidez dos números.
-- O Tesseract pode demorar em vídeos longos ou com muitos frames.
+- **Desempenho (Timeout):** O aplicativo possui um tempo limite de 60 segundos por padrão na extração. Arquivos de vídeo muito longos podem acabar em falha devido a este timeout imposto.
+- **Precisão do OCR:** A acurácia da extração depende consideravelmente da nitidez dos números dentro do vídeo e dos fundos contrastantes da imagem.
+- **Arquivos temporários:** Os arquivos de idiomas do Tesseract (`por.traineddata`, `eng.traineddata`) estarão presentes na pasta raiz na primeira execução ou caso já estejam em cache localmente.
 
 ## 📄 Licença
 
